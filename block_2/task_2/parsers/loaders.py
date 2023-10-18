@@ -6,13 +6,14 @@ from typing import Optional, Union
 
 import aiohttp
 import aiofile
+import requests
 
 from constants import DATA_FILES_DIR, DOWNLOAD_DIR
 
 
 class FileDownloader:
     """
-    Asynchronous file downloader.
+    Base file donwloader.
 
     Args:
         - **urls** - list of urls for downloading files;
@@ -25,8 +26,6 @@ class FileDownloader:
         dir_path: Optional[Union[Path, str]] = None
     ) -> None:
         self._urls = urls
-        self._semaphore = asyncio.BoundedSemaphore(5)
-
         self._path = self.__handle_dir_path(dir_path)
 
     def __handle_dir_path(
@@ -47,6 +46,19 @@ class FileDownloader:
         """Creates a dir if it doesn't exist."""
         if not os.path.isdir(dir_path):
             os.mkdir(dir_path)
+
+
+class AsyncFileDownloader(FileDownloader):
+    """Asynchronous file downloader."""
+
+    def __init__(
+        self,
+        urls: list[str],
+        dir_path: Optional[Union[Path, str]] = None
+    ) -> None:
+        super().__init__(urls, dir_path)
+
+        self._semaphore = asyncio.BoundedSemaphore(5)
 
     async def _fetch(self, session: aiohttp.ClientSession, url: str):
         """Recieves data and writes it to a file."""
@@ -72,3 +84,21 @@ class FileDownloader:
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._run())
         loop.close()
+
+
+class SyncFileDownloader(FileDownloader):
+    """Synchronous file downloader."""
+
+    def _fetch(self, url: str) -> None:
+        """Recieves data and writes it to a file."""
+        filename: str = url.split('/')[-1]
+        path: Path = self._path / filename
+
+        response = requests.get(url)
+        if response.status_code == HTTPStatus.OK:
+            with open(path, 'wb') as file:
+                file.write(response.content)
+
+    def download(self):
+        """In for loop starts downloading a files from the urls list."""
+        [self._fetch(url) for url in self._urls]
