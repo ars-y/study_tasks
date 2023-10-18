@@ -3,7 +3,7 @@ from pathlib import Path
 import constants as const
 from parsers.datafile import DataFileParser
 from parsers.collectors import URLParser
-from parsers.loaders import FileDownloader
+from parsers.loaders import AsyncFileDownloader
 from utils import get_files
 
 
@@ -17,7 +17,7 @@ def main():
             const.TagName.LI: const.LI_TAG_CLASS,
         }
     )
-    downloader = FileDownloader(links)
+    downloader = AsyncFileDownloader(links)
     downloader.download()
     path: Path = const.DOWNLOAD_DIR
     files: list[str] = get_files(path)
