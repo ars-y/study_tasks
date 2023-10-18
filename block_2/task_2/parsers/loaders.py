@@ -94,10 +94,13 @@ class SyncFileDownloader(FileDownloader):
         filename: str = url.split('/')[-1]
         path: Path = self._path / filename
 
-        response = requests.get(url)
-        if response.status_code == HTTPStatus.OK:
-            with open(path, 'wb') as file:
-                file.write(response.content)
+        with requests.Session() as session:
+            session.trust_env = True
+
+            response = session.get(url)
+            if response.status_code == HTTPStatus.OK:
+                with open(path, 'wb') as file:
+                    file.write(response.content)
 
     def download(self):
         """In for loop starts downloading a files from the urls list."""
