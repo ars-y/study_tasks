@@ -93,6 +93,15 @@ class DataFileParser:
             index=False
         )
 
+    def _change_columns_type(
+        self,
+        df: pd.DataFrame,
+        col_names: tuple[str],
+        col_type: str
+    ) -> pd.DataFrame:
+        """Changes the type of selected columns."""
+        return df.astype(dict.fromkeys(col_names, col_type))
+
     def parse(self):
         """Run file data parsing."""
         cols: dict[str, str] = self._get_table_column_names()
@@ -107,5 +116,12 @@ class DataFileParser:
 
         self._add_special_columns(df, cols[const.EXCHANGE_PRODUCT_ID])
         self._rename_columns(df, cols.values(), cols.keys())
+
+        column_with_wrong_type: tuple[str] = (
+            const.COUNT,
+            const.VOLUME,
+            const.TOTAL,
+        )
+        df = self._change_columns_type(df, column_with_wrong_type, 'int')
 
         self._save(df)
