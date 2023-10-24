@@ -41,7 +41,7 @@ async def get_last_trading_dates(
 
 @router.post('/dynamics', response_model=list[spimex_schema.TradeResults])
 async def get_dynamics(
-    trade_filter: spimex_schema.TradePost,
+    trade_filter: spimex_schema.TradePostWithDate,
     session: Annotated[AsyncSession,  Depends(sessions.get_session)]
 ):
     """Returns list of trades for a given period."""
@@ -72,7 +72,7 @@ async def get_dynamics(
     response_model=list[spimex_schema.TradeResults]
 )
 async def get_trading_results(
-    trade_filter: spimex_schema.Trade,
+    trade_filter: spimex_schema.TradePost,
     session: Annotated[AsyncSession,  Depends(sessions.get_session)]
 ):
     """Returns a list of recent trades."""

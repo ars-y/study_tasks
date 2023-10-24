@@ -23,7 +23,7 @@ class SpimexService:
     @staticmethod
     async def get_dynamics(
         session: AsyncSession,
-        trade_filter: spimex_schema.TradePost
+        trade_filter: spimex_schema.TradePostWithDate
     ):
         query = await SpimexService.__get_trade_query(trade_filter)
 
@@ -41,7 +41,7 @@ class SpimexService:
     @staticmethod
     async def get_trading_results(
         session: AsyncSession,
-        trade_filter: spimex_schema.Trade
+        trade_filter: spimex_schema.TradePost
     ):
         query = await SpimexService.__get_trade_query(trade_filter)
 
@@ -75,12 +75,21 @@ class SpimexService:
 
     @staticmethod
     async def __get_trade_query(
-        trade_filter: Union[spimex_schema.Trade, spimex_schema.TradePost]
+        trade_filter: Union[
+            spimex_schema.TradePost,
+            spimex_schema.TradePostWithDate
+        ]
     ):
         query = select(
+            SpimexTradingResults.exchange_product_id,
+            SpimexTradingResults.exchange_product_name,
             SpimexTradingResults.oil_id,
-            SpimexTradingResults.delivery_type_id,
             SpimexTradingResults.delivery_basis_id,
+            SpimexTradingResults.delivery_basis_name,
+            SpimexTradingResults.delivery_type_id,
+            SpimexTradingResults.volume,
+            SpimexTradingResults.total,
+            SpimexTradingResults.count,
             SpimexTradingResults.date
         )
         query = query.filter(
