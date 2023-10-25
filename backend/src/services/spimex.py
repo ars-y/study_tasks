@@ -33,7 +33,7 @@ class SpimexService:
                     trade_filter.start_date, trade_filter.end_date
                 )
             )
-
+        query = query.order_by(desc(SpimexTradingResults.date))
         results = await session.execute(query)
 
         return results.fetchall()
@@ -44,7 +44,7 @@ class SpimexService:
         trade_filter: spimex_schema.TradePost
     ):
         query = await SpimexService.__get_trade_query(trade_filter)
-
+        query = query.order_by(desc(SpimexTradingResults.date))
         results = await session.execute(query)
 
         return results.fetchall()
