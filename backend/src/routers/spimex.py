@@ -45,11 +45,8 @@ async def get_dynamics(
     session: Annotated[AsyncSession,  Depends(sessions.get_session)]
 ):
     """Returns list of trades for a given period."""
-    date_format: str = '%Y-%m-%d'
-    trade_filter.start_date = dtw.create_date(
-        trade_filter.start_date, date_format
-    )
-    trade_filter.end_date = dtw.create_date(trade_filter.end_date, date_format)
+    trade_filter.start_date = dtw.create_date(trade_filter.start_date)
+    trade_filter.end_date = dtw.create_date(trade_filter.end_date)
 
     key: str = hash_key(trade_filter.model_dump_json())
     cache_data = await redis.get_cache(key)
