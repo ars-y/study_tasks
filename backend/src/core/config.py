@@ -1,16 +1,16 @@
 from pydantic import PostgresDsn, RedisDsn
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
-class Config(BaseSettings):
+class SpimexSettings(BaseSettings):
 
     DATABASE_URL: PostgresDsn
     REDIS_URL: RedisDsn
-    model_config = SettingsConfigDict(
-        env_file='.env',
-        env_file_encoding='utf-8',
-        extra='allow'
-    )
+
+    class Config:
+        env_file = '.env'
+        env_file_encoding = 'utf-8'
+        extra = 'allow'
 
 
-settings = Config()
+settings = SpimexSettings()
